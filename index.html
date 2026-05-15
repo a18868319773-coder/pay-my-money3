@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>袁城皓 A钱！</title>
+  <style>
+    :root {
+      --bg: #020204;
+      --glass: rgba(255, 255, 255, 0.08);
+      --glass-strong: rgba(255, 255, 255, 0.14);
+      --stroke: rgba(255, 255, 255, 0.24);
+      --text: rgba(255, 255, 255, 0.96);
+      --muted: rgba(255, 255, 255, 0.58);
+      --gold: #ffd36a;
+      --gold-2: #ff9f0a;
+      --green: #34c759;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      min-height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+        "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", Arial, sans-serif;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -3;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(255, 211, 106, 0.28), transparent 28%),
+        radial-gradient(circle at 82% 22%, rgba(52, 199, 89, 0.17), transparent 30%),
+        radial-gradient(circle at 50% 92%, rgba(255, 159, 10, 0.2), transparent 34%),
+        linear-gradient(180deg, #07070a 0%, #010103 50%, #000 100%);
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -2;
+      opacity: 0.5;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: radial-gradient(circle at center, black 0%, transparent 76%);
+    }
+
+    .app {
+      height: 100vh;
+      height: 100svh;
+      overflow-y: auto;
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .screen {
+      position: relative;
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100svh;
+      scroll-snap-align: start;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: max(28px, env(safe-area-inset-top)) 22px max(28px, env(safe-area-inset-bottom));
+      overflow: hidden;
+    }
+
+    .noise {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      opacity: 0.12;
+      pointer-events: none;
+      background:
+        repeating-radial-gradient(circle at 17% 21%, rgba(255,255,255,0.38) 0 1px, transparent 1px 4px);
+      mix-blend-mode: overlay;
+    }
+
+    .orb {
+      position: absolute;
+      width: 230px;
+      height: 230px;
+      border-radius: 999px;
+      filter: blur(6px);
+      opacity: 0.8;
+      pointer-events: none;
+      background: radial-gradient(circle, rgba(255,211,106,0.32) 0%, rgba(255,159,10,0.12) 42%, transparent 72%);
+      animation: floatOrb 8s ease-in-out infinite alternate;
+    }
+
+    .orb.one {
+      top: 8%;
+      left: -90px;
+    }
+
+    .orb.two {
+      right: -120px;
+      bottom: 8%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(52,199,89,0.24) 0%, rgba(255,211,106,0.1) 48%, transparent 72%);
+      animation-delay: -3s;
+    }
+
+    @keyframes floatOrb {
+      from { transform: translate3d(0, 0, 0) scale(1); }
+      to { transform: translate3d(24px, -34px, 0) scale(1.08); }
+    }
+
+    .glass-card {
+      position: relative;
+      z-index: 3;
+      width: min(100%, 420px);
+      min-height: 62vh;
+      padding: 34px 24px;
+      border: 1px solid var(--stroke);
+      border-radius: 36px;
+      background:
+        linear-gradient(145deg, rgba(255,255,255,0.16), rgba(255,255,255,0.04) 48%, rgba(255,255,255,0.1)),
+        rgba(255,255,255,0.04);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.32),
+        inset 0 -1px 0 rgba(255,255,255,0.08),
+        0 32px 90px rgba(0,0,0,0.58),
+        0 0 0 1px rgba(255,255,255,0.04);
+      backdrop-filter: blur(26px) saturate(170%);
+      -webkit-backdrop-filter: blur(26px) saturate(170%);
+      overflow: hidden;
+    }
+
+    .glass-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 18% 8%, rgba(255,255,255,0.42), transparent 24%),
+        linear-gradient(115deg, transparent 0%, rgba(255,255,255,0.16) 42%, transparent 48%);
+      opacity: 0.72;
+    }
+
+    .content {
+      position: relative;
+      z-index: 2;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 34px;
+      padding: 0 14px;
+      border-radius: 999px;
+      color: rgba(255,255,255,0.78);
+      font-size: 13px;
+      letter-spacing: 0.02em;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.07);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.18);
+    }
+
+    .hero-title {
+      margin: 42px 0 12px;
+      font-size: clamp(48px, 14vw, 78px);
+      line-height: 0.94;
+      letter-spacing: -0.08em;
+      font-weight: 800;
+      text-wrap: balance;
+    }
+
+    .hero-title .gold {
+      display: inline-block;
+      margin-top: 10px;
+      color: transparent;
+      background: linear-gradient(120deg, #fff7d6 0%, #ffd36a 35%, #ff9f0a 65%, #fff2b8 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      filter: drop-shadow(0 0 26px rgba(255, 211, 106, 0.22));
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.75;
+      letter-spacing: 0.02em;
+    }
+
+    .money-badge {
+      margin-top: 34px;
+      width: 100%;
+      padding: 18px;
+      border-radius: 26px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.07);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.14);
+    }
+
+    .money-badge b {
+      font-size: 26px;
+      letter-spacing: -0.04em;
+    }
+
+    .money-badge span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .scroll-tip {
+      position: absolute;
+      left: 50%;
+      bottom: max(20px, env(safe-area-inset-bottom));
+      z-index: 8;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.48);
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      animation: tip 1.35s ease-in-out infinite;
+    }
+
+    @keyframes tip {
+      0%, 100% { transform: translate(-50%, 0); opacity: 0.4; }
+      50% { transform: translate(-50%, 8px); opacity: 0.95; }
+    }
+
+    .field-label {
+      display: block;
+      margin: 40px 0 10px;
+      color: rgba(255,255,255,0.62);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .money-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .input-wrap::before {
+      content: "¥";
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,255,255,0.5);
+      font-size: 20px;
+      font-weight: 700;
+      z-index: 2;
+    }
+
+    input {
+      width: 100%;
+      height: 58px;
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 20px;
+      outline: none;
+      background: rgba(255,255,255,0.08);
+      color: white;
+      padding: 0 16px 0 38px;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.18),
+        0 10px 26px rgba(0,0,0,0.24);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    input::placeholder {
+      color: rgba(255,255,255,0.28);
+    }
+
+    button {
+      height: 58px;
+      border: 0;
+      border-radius: 20px;
+      padding: 0 16px;
+      color: #201300;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      background: linear-gradient(135deg, #fff2b8 0%, #ffd36a 42%, #ff9f0a 100%);
+      box-shadow:
+        0 14px 34px rgba(255,159,10,0.32),
+        inset 0 1px 0 rgba(255,255,255,0.62);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    .hint {
+      margin: 10px 0 0;
+      color: rgba(255,255,255,0.46);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .result {
+      margin-top: 24px;
+      min-height: 70px;
+      padding: 18px;
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.78);
+      font-size: 14px;
+      line-height: 1.65;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+    }
+
+    .result strong {
+      color: var(--gold);
+      font-size: 24px;
+      letter-spacing: -0.04em;
+    }
+
+    .falling-money {
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .money {
+      position: absolute;
+      top: -14vh;
+      left: var(--x);
+      font-size: var(--size);
+      opacity: var(--opacity);
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,0.35));
+      animation:
+        fall var(--duration) linear var(--delay) infinite,
+        sway var(--sway) ease-in-out var(--delay) infinite alternate;
+      will-change: transform;
+    }
+
+    @keyframes fall {
+      from { translate: 0 -16vh; rotate: 0deg; }
+      to { translate: 0 124vh; rotate: var(--rotate); }
+    }
+
+    @keyframes sway {
+      from { margin-left: calc(var(--drift) * -1); }
+      to { margin-left: var(--drift); }
+    }
+
+    .page-count {
+      position: fixed;
+      right: 16px;
+      top: max(14px, env(safe-area-inset-top));
+      z-index: 9;
+      height: 30px;
+      padding: 0 11px;
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      color: rgba(255,255,255,0.52);
+      font-size: 12px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    @media (max-width: 380px) {
+      .glass-card {
+        border-radius: 30px;
+        padding: 28px 18px;
+      }
+
+      .money-row {
+        grid-template-columns: 1fr;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="falling-money" id="fallingMoney" aria-hidden="true"></div>
+  <div class="page-count">H5 · 9:16</div>
+
+  <main class="app" id="app">
+    <section class="screen">
+      <div class="noise"></div>
+      <div class="orb one"></div>
+      <div class="orb two"></div>
+
+      <article class="glass-card">
+        <div class="content">
+          <div class="pill">💸 Liquid Glass Collection</div>
+          <h1 class="hero-title">
+            袁城皓
+            <span class="gold">A钱！</span>
+          </h1>
+          <p class="subtitle">
+            高级黑底玻璃质感 · 金钱雨持续营业中。<br />
+            往下滑，输入金额并确认 A 钱。
+          </p>
+
+          <div class="money-badge">
+            <div>
+              <b>💰💵🪙</b><br />
+              <span>今日账单正在召唤</span>
+            </div>
+            <b>Go</b>
+          </div>
+        </div>
+      </article>
+
+      <div class="scroll-tip">Swipe Down ↓</div>
+    </section>
+
+    <section class="screen">
+      <div class="noise"></div>
+      <div class="orb one"></div>
+      <div class="orb two"></div>
+
+      <article class="glass-card">
+        <div class="content">
+          <div class="pill">🧾 Split Bill Terminal</div>
+          <h2 class="hero-title" style="font-size: clamp(38px, 11vw, 58px); margin-top: 34px;">
+            输入<br />
+            <span class="gold">A钱金额</span>
+          </h2>
+          <p class="subtitle">袁城皓专属虚拟收款界面。</p>
+
+          <label class="field-label" for="amount">请在此输入金额</label>
+          <div class="money-row">
+            <div class="input-wrap">
+              <input
+                id="amount"
+                inputmode="decimal"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+                autocomplete="off"
+              />
+            </div>
+            <button id="confirmBtn" type="button">确认A钱</button>
+          </div>
+          <p class="hint">输入后点击按钮，会在下方生成确认提示。此页面为展示用 H5，不会真正扣款。</p>
+
+          <div class="result" id="result">
+            等待输入金额中……
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const moneyLayer = document.getElementById("fallingMoney");
+    const emojis = ["💸", "💰", "🪙", "💵", "💴", "💶"];
+
+    function createMoneyRain(count = 34) {
+      moneyLayer.innerHTML = "";
+      for (let i = 0; i < count; i++) {
+        const item = document.createElement("span");
+        item.className = "money";
+        item.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        item.style.setProperty("--x", Math.random() * 100 + "vw");
+        item.style.setProperty("--size", (18 + Math.random() * 26) + "px");
+        item.style.setProperty("--opacity", (0.42 + Math.random() * 0.5).toFixed(2));
+        item.style.setProperty("--duration", (5.8 + Math.random() * 5.6).toFixed(2) + "s");
+        item.style.setProperty("--delay", (-Math.random() * 9).toFixed(2) + "s");
+        item.style.setProperty("--rotate", (160 + Math.random() * 420).toFixed(0) + "deg");
+        item.style.setProperty("--drift", (14 + Math.random() * 36).toFixed(0) + "px");
+        item.style.setProperty("--sway", (1.8 + Math.random() * 2.2).toFixed(2) + "s");
+        moneyLayer.appendChild(item);
+      }
+    }
+
+    createMoneyRain();
+
+    const amount = document.getElementById("amount");
+    const btn = document.getElementById("confirmBtn");
+    const result = document.getElementById("result");
+
+    function formatMoney(value) {
+      const num = Number(value);
+      if (!Number.isFinite(num) || num <= 0) return "";
+      return num.toLocaleString("zh-CN", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    btn.addEventListener("click", () => {
+      const formatted = formatMoney(amount.value);
+      if (!formatted) {
+        result.innerHTML = "请先输入一个有效金额。";
+        amount.focus();
+        return;
+      }
+
+      result.innerHTML = `已确认：袁城皓需要 A 钱<br /><strong>¥ ${formatted}</strong><br />💸 金钱雨已加强。`;
+      createMoneyRain(54);
+    });
+  </script>
+</body>
+</html>
