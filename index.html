@@ -15,6 +15,7 @@
       --gold: #ffd36a;
       --gold-2: #ff9f0a;
       --green: #34c759;
+      --red: #ff453a;
     }
 
     * {
@@ -186,7 +187,8 @@
       text-wrap: balance;
     }
 
-    .hero-title .gold {
+    .hero-title .gold,
+    .gold-text {
       display: inline-block;
       margin-top: 10px;
       color: transparent;
@@ -315,10 +317,12 @@
         inset 0 1px 0 rgba(255,255,255,0.62);
       cursor: pointer;
       white-space: nowrap;
+      transition: transform 0.18s ease, filter 0.18s ease;
     }
 
     button:active {
       transform: scale(0.97);
+      filter: brightness(1.08);
     }
 
     .hint {
@@ -341,10 +345,79 @@
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
     }
 
-    .result strong {
-      color: var(--gold);
-      font-size: 24px;
-      letter-spacing: -0.04em;
+    .success-icon {
+      width: 90px;
+      height: 90px;
+      margin: 26px auto 28px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      color: #061006;
+      font-size: 44px;
+      font-weight: 900;
+      background:
+        radial-gradient(circle at 30% 24%, #ffffff 0%, #c9ffd2 28%, #34c759 68%, #168c36 100%);
+      box-shadow:
+        0 0 0 10px rgba(52,199,89,0.08),
+        0 0 70px rgba(52,199,89,0.42),
+        inset 0 1px 0 rgba(255,255,255,0.7);
+      animation: successPop 0.72s cubic-bezier(.2, 1.45, .32, 1) both;
+    }
+
+    @keyframes successPop {
+      0% { transform: scale(0.6); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .success-title {
+      margin: 0;
+      text-align: center;
+      font-size: clamp(42px, 12vw, 64px);
+      line-height: 0.98;
+      letter-spacing: -0.08em;
+      font-weight: 850;
+    }
+
+    .balance-card {
+      margin-top: 30px;
+      padding: 22px 18px;
+      border-radius: 28px;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.16);
+      background:
+        linear-gradient(145deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04)),
+        rgba(255,255,255,0.06);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.16),
+        0 18px 42px rgba(0,0,0,0.28);
+    }
+
+    .balance-label {
+      color: rgba(255,255,255,0.52);
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .balance-num {
+      margin-top: 10px;
+      color: transparent;
+      background: linear-gradient(120deg, #fff7d6 0%, #ffd36a 40%, #ff9f0a 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      font-size: clamp(36px, 12vw, 54px);
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: -0.06em;
+      filter: drop-shadow(0 0 24px rgba(255, 159, 10, 0.22));
+    }
+
+    .small-note {
+      margin-top: 18px;
+      color: rgba(255,255,255,0.42);
+      text-align: center;
+      font-size: 12px;
+      line-height: 1.65;
     }
 
     .falling-money {
@@ -418,7 +491,7 @@
   <div class="page-count">H5 · 9:16</div>
 
   <main class="app" id="app">
-    <section class="screen">
+    <section class="screen" id="home">
       <div class="noise"></div>
       <div class="orb one"></div>
       <div class="orb two"></div>
@@ -448,7 +521,7 @@
       <div class="scroll-tip">Swipe Down ↓</div>
     </section>
 
-    <section class="screen">
+    <section class="screen" id="inputPage">
       <div class="noise"></div>
       <div class="orb one"></div>
       <div class="orb two"></div>
@@ -477,11 +550,35 @@
             </div>
             <button id="confirmBtn" type="button">确认A钱</button>
           </div>
-          <p class="hint">输入后点击按钮，会在下方生成确认提示。此页面为展示用 H5，不会真正扣款。</p>
+          <p class="hint">输入后点击按钮，将跳转到扣款成功页面。此页面为展示用 H5，不涉及真实扣款。</p>
 
           <div class="result" id="result">
             等待输入金额中……
           </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="screen" id="successPage">
+      <div class="noise"></div>
+      <div class="orb one"></div>
+      <div class="orb two"></div>
+
+      <article class="glass-card">
+        <div class="content">
+          <div class="pill">✅ Transaction Completed</div>
+          <div class="success-icon">✓</div>
+          <h2 class="success-title">
+            扣款<br />
+            <span class="gold-text">成功</span>
+          </h2>
+
+          <div class="balance-card">
+            <div class="balance-label">账户余额</div>
+            <div class="balance-num">-999999$</div>
+          </div>
+
+          <p class="small-note">袁城皓 A钱系统已完成本次虚拟扣款确认。</p>
         </div>
       </article>
     </section>
@@ -511,9 +608,11 @@
 
     createMoneyRain();
 
+    const app = document.getElementById("app");
     const amount = document.getElementById("amount");
     const btn = document.getElementById("confirmBtn");
     const result = document.getElementById("result");
+    const successPage = document.getElementById("successPage");
 
     function formatMoney(value) {
       const num = Number(value);
@@ -524,6 +623,12 @@
       });
     }
 
+    function goSuccessPage() {
+      history.replaceState(null, "", "#success");
+      successPage.scrollIntoView({ behavior: "smooth", block: "start" });
+      createMoneyRain(68);
+    }
+
     btn.addEventListener("click", () => {
       const formatted = formatMoney(amount.value);
       if (!formatted) {
@@ -532,8 +637,20 @@
         return;
       }
 
-      result.innerHTML = `已确认：袁城皓需要 A 钱<br /><strong>¥ ${formatted}</strong><br />💸 金钱雨已加强。`;
-      createMoneyRain(54);
+      result.innerHTML = `金额 ¥ ${formatted} 已提交，正在跳转……`;
+      btn.disabled = true;
+      btn.textContent = "扣款中…";
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.textContent = "确认A钱";
+        goSuccessPage();
+      }, 650);
+    });
+
+    window.addEventListener("load", () => {
+      if (location.hash === "#success") {
+        setTimeout(() => successPage.scrollIntoView({ block: "start" }), 120);
+      }
     });
   </script>
 </body>
